@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6c2938">
+<title>A Little World of You ❤️</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+<header class="topbar"><span class="tiny-heart">♥</span><span>A LITTLE WORLD OF YOU</span><span class="tiny-heart">♥</span></header>
+<main>
+  <section class="intro" id="intro">
+    <p class="eyebrow">A tiny place made with care</p>
+    <h1>For Someone <em>Special</em></h1>
+    <p class="intro-copy">Some memories deserve their own little book.<br>Open this one slowly. It's filled with moments worth keeping.</p>
+    <button id="openBook" class="primary-btn">Open your scrapbook <span>♡</span></button>
+    <p class="hint">Best experienced with the sound on, but it’s lovely either way.</p>
+  </section>
+
+  <section class="book-area" id="bookArea" aria-label="Interactive scrapbook">
+    <div class="book-shadow"></div>
+    <div class="book" id="book">
+      <div class="book-cover" id="cover">
+        <div class="cover-inner">
+          <div class="cover-stamp">♡</div>
+          <p class="cover-kicker">A COLLECTION OF LITTLE MOMENTS</p>
+          <h2>A Little<br><i>World of You</i></h2>
+          <div class="cover-rule"></div>
+          <p class="cover-sub">memories · smiles · you</p>
+          <span class="cover-flower">✿</span>
+          <button id="coverOpen" class="cover-open">Open the book <span>→</span></button>
+        </div>
+      </div>
+      <div class="pages" id="pages">
+        <article class="spread spread-0 active">
+          <div class="page left-page title-page">
+            <p class="page-label">01 · THE BEGINNING</p>
+            <div class="little-flower">✿</div>
+            <h2>Every story<br>has a <em>beginning.</em></h2>
+            <p class="handwritten">And this little book begins with you.</p>
+            <div class="scribble-heart">♡</div>
+            <p class="page-number">01</p>
+          </div>
+          <div class="page right-page">
+            <div class="photo-frame tilt-left"><img src="photos/memory-01.jpeg" alt="A special memory" loading="lazy"><span class="tape"></span></div>
+            <p class="photo-caption">A moment I wanted to keep ✨</p>
+            <p class="page-note">Some people make an ordinary day feel like a page worth saving.</p>
+            <p class="page-number">02</p>
+          </div>
+        </article>
+        <article class="spread spread-1">
+          <div class="page left-page">
+            <p class="page-label">02 · LITTLE DETAILS</p>
+            <h2>The little things<br>are often the <em>big things.</em></h2>
+            <p class="body-copy">A familiar smile. A look that says a thousand words. The small details that become memories without even trying.</p>
+            <div class="pressed-flower">✿</div><p class="page-number">03</p>
+          </div>
+          <div class="page right-page collage-page">
+            <div class="photo-frame tilt-right small-photo"><img src="photos/memory-02.jpeg" alt="A close-up memory" loading="lazy"><span class="tape"></span></div>
+            <div class="photo-frame tilt-left second-photo"><img src="photos/memory-03.jpeg" alt="Another lovely memory" loading="lazy"><span class="tape"></span></div>
+            <p class="sticker">little<br>things<br>♡</p><p class="page-number">04</p>
+          </div>
+        </article>
+        <article class="spread spread-2">
+          <div class="page left-page photo-full-page">
+            <p class="page-label">03 · YOUR KIND OF MAGIC</p>
+            <div class="photo-frame tilt-left feature-photo"><img src="photos/memory-04.jpeg" alt="A favorite photo" loading="lazy"></div>
+            <p class="photo-caption">A little bit of magic, just being you.</p><p class="page-number">05</p>
+          </div>
+          <div class="page right-page quote-page">
+            <span class="quote-mark">“</span>
+            <blockquote>Some moments are small, but the happiness they leave behind is enormous.</blockquote>
+            <div class="quote-line"></div>
+            <p class="handwritten">Keep being wonderfully you.</p>
+            <span class="quote-flower">✿</span><p class="page-number">06</p>
+          </div>
+        </article>
+        <article class="spread spread-3">
+          <div class="page left-page collage-page">
+            <div class="photo-frame tilt-right small-photo"><img src="photos/memory-05.jpeg" alt="A treasured memory" loading="lazy"><span class="tape"></span></div>
+            <div class="photo-frame tilt-left second-photo"><img src="photos/memory-06.jpeg" alt="A happy moment" loading="lazy"><span class="tape"></span></div>
+            <p class="page-number">07</p>
+          </div>
+          <div class="page right-page">
+            <p class="page-label">04 · SAVED WITH CARE</p>
+            <h2>If memories were<br>little stars,</h2>
+            <p class="body-copy">I'd save the brightest ones in a jar, label it “these made me smile,” and keep it somewhere safe for rainy days.</p>
+            <div class="star-row">✦　✧　✦　✧　✦</div><p class="page-number">08</p>
+          </div>
+        </article>
+        <article class="spread spread-4">
+          <div class="page left-page">
+            <p class="page-label">05 · JUST FOR YOU</p>
+            <div class="photo-frame tilt-left final-photo"><img src="photos/memory-07.jpeg" alt="A final favorite memory" loading="lazy"><span class="tape"></span></div>
+            <p class="photo-caption">One more memory for the collection.</p><p class="page-number">09</p>
+          </div>
+          <div class="page right-page final-page">
+            <div class="final-heart">♡</div>
+            <p class="page-label">A LITTLE NOTE</p>
+            <h2>And that's not<br>the <em>end.</em></h2>
+            <p class="body-copy">This book may have pages, but the best memories are still waiting to happen. Until then, here's a tiny reminder: you matter, and you make this world a little brighter.</p>
+            <p class="handwritten signoff">Made with care, just for you ♡</p>
+            <button class="restart-btn" id="restart">Read it again ↺</button>
+            <p class="page-number">10</p>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="book-controls" id="bookControls">
+      <button id="prevPage" class="nav-btn" aria-label="Previous page">← <span>Back</span></button>
+      <div class="progress-wrap"><div class="progress-track"><div id="progress" class="progress-fill"></div></div><span id="pageCount">Cover</span></div>
+      <button id="nextPage" class="nav-btn" aria-label="Next page"><span>Next</span> →</button>
+    </div>
+    <p class="swipe-hint">You can also use the arrows to turn the pages</p>
+  </section>
+
+  <section class="closing">
+    <span>♡</span><p>Made of memories, wrapped in a little love.</p><span>♡</span>
+  </section>
+</main>
+<footer>YOUR LITTLE SCRAPBOOK · KEEP THE GOOD MOMENTS CLOSE</footer>
+<script src="script.js"></script>
+</body>
+</html>
