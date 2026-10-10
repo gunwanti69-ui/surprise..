@@ -4,23 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>A Little World of You | For Yosha</title>
-  
+
+  <!-- Google Fonts: Elegant, High-Readability Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Confetti Script -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
-      --rose-gold: #c59b86;
-      --burgundy: #581825;
-      --wine: #3b0c16;
-      --cream: #fffaf5;
-      --soft-blush: #fcefe9;
+      --bg-cream: #fbf5ef;
+      --burgundy: #56101f;
+      --deep-wine: #340711;
+      --wax-red: #871424;
       --gold-accent: #d4af37;
-      --text-dark: #2c2523;
-      --card-shadow: 0 16px 36px rgba(59, 12, 22, 0.08);
+      --gold-light: #ffea9f;
+      --text-main: #271c19;
+      --text-muted: #5e4a44;
+      --card-bg: #ffffff;
+      --shadow-soft: 0 14px 35px rgba(52, 7, 17, 0.08);
     }
 
     * {
@@ -31,27 +35,28 @@
 
     html {
       scroll-behavior: smooth;
-      background: var(--cream);
+      background: var(--bg-cream);
       min-height: 100%;
     }
 
     body {
-      font-family: 'Montserrat', sans-serif;
-      color: var(--text-dark);
-      background: radial-gradient(circle at 50% 20%, #fff7f2 0%, #fbf0e8 50%, #f3ded3 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      background: radial-gradient(circle at 50% 15%, #fffaf5 0%, #faeee5 55%, #f1dfd3 100%);
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: hidden;
+      overflow-y: hidden; /* Locked initially for the envelope */
       -webkit-overflow-scrolling: touch;
       position: relative;
     }
 
-    body.envelope-opened {
+    body.envelope-unlocked {
       overflow-y: auto !important;
       height: auto !important;
     }
 
-    #canvas-petals {
+    /* Ambient Falling Petals (Passes through clicks and touch gestures) */
+    #petals-canvas {
       position: fixed;
       inset: 0;
       width: 100vw;
@@ -60,34 +65,35 @@
       z-index: 1;
     }
 
-    /* AUDIO BUTTON */
-    .audio-toggle-btn {
+    /* Sound Control Button */
+    .sound-control-btn {
       position: fixed;
       top: 18px;
       right: 18px;
       z-index: 999;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(197, 155, 134, 0.4);
-      padding: 9px 16px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      padding: 8px 16px;
       border-radius: 30px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--wine);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--deep-wine);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease;
     }
 
-    .audio-toggle-btn:hover {
-      background: #ffffff;
-      transform: scale(1.03);
+    .sound-control-btn:hover {
+      transform: scale(1.04);
     }
 
-    /* ENVELOPE INTRO */
+    /* =========================================
+       STAGE 1: HIGH-VISIBILITY 3D ENVELOPE
+    ========================================= */
     #envelopeStage {
       position: fixed;
       inset: 0;
@@ -96,48 +102,40 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, #fff5f0 0%, #f7ded3 100%);
-      transition: opacity 0.8s ease, visibility 0.8s ease;
+      background: radial-gradient(circle at center, #fff7f2 0%, #f4ded2 100%);
       padding: 20px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
     }
 
-    .envelope-box {
+    .envelope-wrapper {
       position: relative;
       width: 320px;
       height: 220px;
-      perspective: 1000px;
+      perspective: 1200px;
       cursor: pointer;
     }
 
     @media (min-width: 500px) {
-      .envelope-box {
-        width: 390px;
-        height: 260px;
+      .envelope-wrapper {
+        width: 400px;
+        height: 270px;
       }
     }
 
-    .env-body {
+    .envelope-base {
       position: absolute;
       inset: 0;
-      background: #eed5c7;
-      border-radius: 8px;
-      box-shadow: 0 24px 48px rgba(88, 24, 37, 0.18);
+      background: #ebd2c3;
+      border-radius: 10px;
+      box-shadow: 0 25px 50px rgba(52, 7, 17, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.7);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .env-pocket {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, #e3c4b4 0%, #dab5a2 100%);
-      clip-path: polygon(0 100%, 50% 48%, 100% 100%);
-      z-index: 3;
     }
 
     .env-side-left {
       position: absolute;
       inset: 0;
-      background: #dec1b0;
+      background: #dfbfad;
       clip-path: polygon(0 0, 0 100%, 50% 50%);
       z-index: 2;
     }
@@ -145,88 +143,107 @@
     .env-side-right {
       position: absolute;
       inset: 0;
-      background: #d8baaa;
+      background: #d8b7a4;
       clip-path: polygon(100% 0, 100% 100%, 50% 50%);
       z-index: 2;
     }
 
-    .env-flap {
+    .env-pocket-bottom {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #e4c4b2 0%, #d4ad99 100%);
+      clip-path: polygon(0 100%, 50% 48%, 100% 100%);
+      z-index: 3;
+    }
+
+    .env-flap-top {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #e8ccbd;
+      background: #eccfbf;
       clip-path: polygon(0 0, 100% 0, 50% 52%);
       transform-origin: top center;
       transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 4;
-      border-radius: 8px 8px 0 0;
+      border-radius: 10px 10px 0 0;
     }
 
-    .envelope-box.is-opening .env-flap {
+    .envelope-wrapper.is-opening .env-flap-top {
       transform: rotateX(175deg);
       z-index: 1;
     }
 
+    /* Redesigned 3D Wax Seal */
     .wax-seal {
       position: absolute;
       top: 48%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 74px;
-      height: 74px;
-      background: radial-gradient(circle, #7a1f31 0%, #4a0d18 80%);
+      width: 86px;
+      height: 86px;
+      background: radial-gradient(circle, #9d1b2f 0%, var(--wax-red) 55%, var(--deep-wine) 100%);
       border-radius: 50%;
-      box-shadow: 0 4px 18px rgba(59, 12, 22, 0.45);
+      box-shadow: 0 6px 20px rgba(52, 7, 17, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      border: 3px solid var(--gold-accent);
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #ffe6cf;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      text-align: center;
       cursor: pointer;
-      border: 2px solid rgba(212, 175, 55, 0.6);
-      transition: transform 0.3s ease;
-      animation: pulseSeal 2.2s infinite ease-in-out;
+      animation: sealPulse 2.4s infinite ease-in-out;
+      user-select: none;
     }
 
-    @keyframes pulseSeal {
+    @keyframes sealPulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
       50% { transform: translate(-50%, -50%) scale(1.06); }
     }
 
-    .seal-text {
+    .wax-seal-name {
       font-family: 'Alex Brush', cursive;
-      font-size: 1.3rem;
-      color: #ffd699;
+      font-size: 1.8rem;
+      color: var(--gold-light);
       line-height: 1;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     }
 
-    .env-hint {
-      margin-top: 24px;
-      font-size: 0.88rem;
-      letter-spacing: 2px;
+    .wax-seal-sub {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--wine);
-      opacity: 0.8;
+      color: #ffffff;
+      margin-top: 2px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .env-tap-hint {
+      margin-top: 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--burgundy);
       text-align: center;
     }
 
-    /* MAIN WORLD CONTENT */
+    /* =========================================
+       STAGE 2: MAIN DEDICATED WORLD
+    ========================================= */
     #mainWorld {
       display: none;
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 900px;
+      max-width: 860px;
       margin: 0 auto;
-      padding: 60px 20px 100px;
+      padding: 60px 20px 120px;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(24px);
       transition: opacity 1s ease, transform 1s ease;
     }
 
@@ -235,103 +252,109 @@
       transform: translateY(0);
     }
 
-    .hero-header {
+    .page-header {
       text-align: center;
       margin-bottom: 50px;
     }
 
-    .hero-subtitle {
-      font-family: 'Montserrat', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 3.5px;
+    .subtitle-badge {
+      display: inline-block;
       font-size: 0.8rem;
-      color: var(--rose-gold);
-      margin-bottom: 12px;
-      font-weight: 600;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--burgundy);
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 15px;
     }
 
-    .hero-title {
+    .main-heading {
       font-family: 'Alex Brush', cursive;
-      font-size: clamp(3.2rem, 9vw, 5.5rem);
+      font-size: clamp(3.2rem, 9vw, 5.2rem);
       color: var(--burgundy);
       line-height: 1.1;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .hero-desc {
-      font-family: 'Cormorant Garamond', serif;
+    .header-quote {
+      font-family: 'Playfair Display', serif;
       font-size: 1.25rem;
       font-style: italic;
-      color: #634b46;
-      max-width: 580px;
+      color: var(--text-muted);
+      max-width: 540px;
       margin: 0 auto;
+      line-height: 1.6;
     }
 
-    /* HEARTFELT PARCHMENT LETTER */
-    .parchment-letter {
-      background: #ffffff;
-      border: 1px solid rgba(197, 155, 134, 0.28);
+    /* Parchment Love Letter */
+    .parchment-container {
+      background: var(--card-bg);
+      border: 1px solid rgba(197, 155, 134, 0.35);
       border-radius: 16px;
-      padding: 40px 28px;
-      box-shadow: var(--card-shadow);
+      padding: 40px 26px;
+      box-shadow: var(--shadow-soft);
       margin-bottom: 60px;
       position: relative;
     }
 
-    @media (min-width: 600px) {
-      .parchment-letter {
-        padding: 55px 50px;
+    @media (min-width: 650px) {
+      .parchment-container {
+        padding: 55px 48px;
       }
     }
 
-    .letter-salutation {
+    .letter-greeting {
       font-family: 'Alex Brush', cursive;
-      font-size: 2.6rem;
+      font-size: 2.8rem;
       color: var(--burgundy);
+      margin-bottom: 20px;
+    }
+
+    .letter-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.22rem;
+      line-height: 1.95;
+      color: var(--text-main);
+    }
+
+    .letter-text p {
       margin-bottom: 18px;
     }
 
-    .letter-body {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
-      line-height: 1.9;
-      color: #3b2c28;
-    }
-
-    .letter-body p {
-      margin-bottom: 18px;
-    }
-
-    .letter-signature {
+    .letter-signoff {
       font-family: 'Alex Brush', cursive;
       font-size: 2.2rem;
-      color: var(--rose-gold);
+      color: var(--gold-accent);
       text-align: right;
-      margin-top: 24px;
+      margin-top: 25px;
     }
 
-    /* POLAROID PHOTO GALLERY */
+    /* Polaroid Memories Grid */
     .section-title {
       text-align: center;
       font-family: 'Alex Brush', cursive;
       font-size: 3.2rem;
       color: var(--burgundy);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .section-subtitle {
+    .section-desc {
       text-align: center;
       font-size: 0.85rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #7d635d;
+      color: var(--text-muted);
       margin-bottom: 35px;
     }
 
     .polaroid-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: 30px;
       margin-bottom: 70px;
       justify-items: center;
     }
@@ -347,34 +370,34 @@
       background: #ffffff;
       padding: 14px 14px 22px;
       border-radius: 4px;
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 275px;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+      max-width: 270px;
       cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
     }
 
-    .polaroid-card.tilt-left { transform: rotate(-2deg); }
-    .polaroid-card.tilt-right { transform: rotate(2deg); }
+    .polaroid-card.tilt-left { transform: rotate(-2.5deg); }
+    .polaroid-card.tilt-right { transform: rotate(2.5deg); }
 
     .polaroid-card:hover {
       transform: rotate(0deg) scale(1.04);
-      box-shadow: 0 20px 36px rgba(88, 24, 37, 0.16);
+      box-shadow: 0 18px 36px rgba(86, 16, 31, 0.16);
       z-index: 5;
     }
 
-    .polaroid-img-wrapper {
+    .polaroid-frame {
       width: 100%;
       height: 310px;
-      background: #faf4ef;
-      overflow: hidden;
+      background: #f6ede6;
       border-radius: 2px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .polaroid-img-wrapper img {
+    .polaroid-frame img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -382,90 +405,89 @@
       transition: transform 0.5s ease;
     }
 
-    .polaroid-card:hover .polaroid-img-wrapper img {
-      transform: scale(1.05);
+    .polaroid-card:hover .polaroid-frame img {
+      transform: scale(1.06);
     }
 
-    .polaroid-caption {
+    .polaroid-meta {
       text-align: center;
       margin-top: 14px;
     }
 
-    .polaroid-title {
+    .polaroid-caption-title {
       font-family: 'Alex Brush', cursive;
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       color: var(--burgundy);
-      line-height: 1.2;
+      line-height: 1.1;
     }
 
-    .polaroid-date {
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      color: #8c736d;
-      margin-top: 3px;
+    .polaroid-caption-sub {
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    /* SECRET PROPOSAL SECTION */
+    /* Secret Proposal Section */
     .proposal-card {
-      background: linear-gradient(135deg, #fff7f4 0%, #fceedf 100%);
-      border: 2px dashed rgba(197, 155, 134, 0.6);
+      background: linear-gradient(135deg, #fff7f4 0%, #faecdf 100%);
+      border: 2px dashed rgba(212, 175, 55, 0.6);
       border-radius: 20px;
       padding: 40px 24px;
       text-align: center;
-      box-shadow: var(--card-shadow);
-      margin-top: 30px;
+      box-shadow: var(--shadow-soft);
     }
 
     @media (min-width: 600px) {
       .proposal-card {
-        padding: 50px 40px;
+        padding: 55px 44px;
       }
     }
 
-    .lock-btn {
-      background: linear-gradient(135deg, var(--burgundy) 0%, var(--wine) 100%);
-      color: #ffe8dc;
+    .secret-btn {
+      background: linear-gradient(135deg, var(--burgundy) 0%, var(--deep-wine) 100%);
+      color: #ffe9df;
       border: none;
       padding: 15px 32px;
       border-radius: 40px;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 1.5px;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(88, 24, 37, 0.28);
+      box-shadow: 0 10px 24px rgba(86, 16, 31, 0.28);
       transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
       gap: 10px;
     }
 
-    .lock-btn:hover {
+    .secret-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(88, 24, 37, 0.36);
+      box-shadow: 0 14px 30px rgba(86, 16, 31, 0.38);
     }
 
-    #secretProposalContent {
+    #revealedProposal {
       display: none;
-      margin-top: 30px;
-      animation: fadeInReveal 1s ease forwards;
+      margin-top: 32px;
+      animation: fadeInReveal 0.9s ease forwards;
     }
 
     @keyframes fadeInReveal {
-      from { opacity: 0; transform: translateY(15px); }
+      from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .proposal-text {
-      font-family: 'Cormorant Garamond', serif;
+    .proposal-quote {
+      font-family: 'Playfair Display', serif;
       font-size: 1.4rem;
       line-height: 1.9;
-      color: #2e1d1b;
-      margin-bottom: 24px;
+      color: var(--deep-wine);
+      margin-bottom: 26px;
       font-style: italic;
       font-weight: 600;
     }
 
-    .proposal-buttons {
+    .response-buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -473,39 +495,39 @@
       margin-top: 25px;
     }
 
-    .yes-btn {
-      background: linear-gradient(135deg, #a12b42 0%, #631221 100%);
+    .proposal-yes-btn {
+      background: linear-gradient(135deg, #9d1b2f 0%, #56101f 100%);
       color: #ffffff;
       border: none;
-      padding: 14px 34px;
+      padding: 14px 36px;
       border-radius: 30px;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(99, 18, 33, 0.3);
-      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(86, 16, 31, 0.3);
+      transition: transform 0.2s ease;
     }
 
-    .yes-btn:hover {
+    .proposal-yes-btn:hover {
       transform: scale(1.06);
     }
 
     #celebrationBanner {
       display: none;
       margin-top: 30px;
-      padding: 24px;
+      padding: 26px;
       background: #ffffff;
       border-radius: 14px;
       border: 1px solid var(--gold-accent);
-      animation: bounceIn 0.8s ease;
+      animation: zoomInBanner 0.7s ease;
     }
 
-    @keyframes bounceIn {
-      0% { transform: scale(0.8); opacity: 0; }
+    @keyframes zoomInBanner {
+      0% { transform: scale(0.85); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* LIGHTBOX MODAL */
+    /* Lightbox Modal */
     .lightbox-modal {
       position: fixed;
       inset: 0;
@@ -518,19 +540,19 @@
       backdrop-filter: blur(8px);
     }
 
-    .lightbox-content {
+    .lightbox-img {
       max-width: 90vw;
       max-height: 85vh;
-      border-radius: 10px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
       object-fit: contain;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
 
     .lightbox-close {
       position: absolute;
-      top: 24px;
+      top: 22px;
       right: 28px;
-      color: #fff;
+      color: #ffffff;
       font-size: 2.2rem;
       cursor: pointer;
     }
@@ -538,120 +560,121 @@
 </head>
 <body>
 
-  <!-- BACKGROUND PETALS CANVAS -->
-  <canvas id="canvas-petals"></canvas>
+  <!-- FLOATING PETALS CANVAS -->
+  <canvas id="petals-canvas"></canvas>
 
-  <!-- BACKGROUND MUSIC ELEMENT -->
-  <audio id="bgMusic" preload="auto" loop>
+  <!-- BACKGROUND MUSIC (Reads music.mp3 directly from your folder) -->
+  <audio id="bgSong" preload="auto" loop>
     <source src="music.mp3" type="audio/mpeg">
-    <source src="music.mp3" type="audio/mp4">
   </audio>
 
-  <!-- SOUND TOGGLE -->
-  <button class="audio-toggle-btn" id="audioToggleBtn" onclick="toggleAudio()" title="Play / Pause Audio">
-    <span id="audioIcon">🎵</span>
-    <span id="audioLabel">Music: Playing</span>
+  <!-- MUTE / UNMUTE BUTTON -->
+  <button class="sound-control-btn" id="soundBtn" onclick="toggleAudio()" title="Sound Toggle">
+    <span id="soundIcon">🎵</span>
+    <span id="soundStatus">Music: Playing</span>
   </button>
 
-  <!-- STAGE 1: WAX SEALED ENVELOPE -->
+  <!-- STAGE 1: SEALED ENVELOPE -->
   <div id="envelopeStage">
-    <div class="envelope-box" id="envelopeBox" onclick="openEnvelope()">
-      <div class="env-body">
+    <div class="envelope-wrapper" id="envelopeWrapper" onclick="openEnvelope()">
+      <div class="envelope-base">
         <div class="env-side-left"></div>
         <div class="env-side-right"></div>
-        <div class="env-pocket"></div>
+        <div class="env-pocket-bottom"></div>
       </div>
-      <div class="env-flap"></div>
+      <div class="env-flap-top"></div>
+      
+      <!-- Clear Wax Seal -->
       <div class="wax-seal">
-        <span class="seal-text">Yosha</span>
-        <span>Tap to Open</span>
+        <span class="wax-seal-name">Yosha</span>
+        <span class="wax-seal-sub">Open ❤️</span>
       </div>
     </div>
-    <div class="env-hint">A heartfelt letter waiting just for you ✨</div>
+    <div class="env-tap-hint">Tap the seal to open your letter ✨</div>
   </div>
 
   <!-- STAGE 2: MAIN WORLD -->
   <main id="mainWorld">
-    <header class="hero-header">
-      <div class="hero-subtitle">Dedicated to the one who makes life gentle</div>
-      <h1 class="hero-title">A Little World of You</h1>
-      <p class="hero-desc">Every piece of this space exists simply to celebrate you, Yosha.</p>
+    <header class="page-header">
+      <div class="subtitle-badge">Dedicated to you</div>
+      <h1 class="main-heading">A Little World of You</h1>
+      <p class="header-quote">Every line, every moment, and every song here belongs only to you, Yosha.</p>
     </header>
 
     <!-- HEARTFELT LETTER -->
-    <article class="parchment-letter">
-      <div class="letter-salutation">Dear Yosha,</div>
-      <div class="letter-body">
+    <article class="parchment-container">
+      <div class="letter-greeting">Dear Yosha,</div>
+      <div class="letter-text">
         <p>Some people cross our paths like a gentle breeze, bringing stillness to all the noise. From the moment you came into my world, you brought an effortless warmth and a kindness that cannot be put into simple words.</p>
         <p>I built this quiet corner of the web because you deserve to be reminded of how treasured you are. In every gesture, in your laughter, and in your quiet moments, you carry something unforgettable.</p>
         <p>Thank you for simply existing as you are, and for making life infinitely softer and brighter.</p>
       </div>
-      <div class="letter-signature">With all my heart</div>
+      <div class="letter-signoff">With all my heart</div>
     </article>
 
-    <!-- MOMENTS & MEMORIES: 3 POLAROIDS -->
+    <!-- MEMORIES GALLERY (Linked to photo1.jpeg, photo2.jpeg, photo3.jpeg) -->
     <section>
       <h2 class="section-title">Cherished Moments</h2>
-      <div class="section-subtitle">A glimpse of the beauty you bring</div>
+      <div class="section-desc">Snapshots of your beauty and smile</div>
 
       <div class="polaroid-grid">
-        <!-- PHOTO 1: Red dress / Night lights -->
-        <div class="polaroid-card tilt-left" onclick="openLightbox('photo1.jpg', 'That radiant smile under the evening lights.')">
-          <div class="polaroid-img-wrapper">
-            <img src="photo1.jpg" alt="Yosha" loading="eager">
+        <!-- PHOTO 1: Red Dress / Evening Lights -->
+        <div class="polaroid-card tilt-left" onclick="openLightbox('photo1.jpeg')">
+          <div class="polaroid-frame">
+            <img src="photo1.jpeg" alt="Yosha" loading="eager">
           </div>
-          <div class="polaroid-caption">
-            <div class="polaroid-title">Evening Glow ✨</div>
-            <div class="polaroid-date">Forever etched in my heart</div>
-          </div>
-        </div>
-
-        <!-- PHOTO 2: Childhood photo -->
-        <div class="polaroid-card" onclick="openLightbox('photo2.jpg', 'Pure innocence and the sweetest eyes.')">
-          <div class="polaroid-img-wrapper">
-            <img src="photo2.jpg" alt="Yosha Childhood" loading="eager">
-          </div>
-          <div class="polaroid-caption">
-            <div class="polaroid-title">Little Miracle 🌸</div>
-            <div class="polaroid-date">The beginning of you</div>
+          <div class="polaroid-meta">
+            <div class="polaroid-caption-title">Evening Glow ✨</div>
+            <div class="polaroid-caption-sub">Forever in my heart</div>
           </div>
         </div>
 
-        <!-- PHOTO 3: Red saree portrait -->
-        <div class="polaroid-card tilt-right" onclick="openLightbox('photo3.jpg', 'Grace, elegance, and pure poetry.')">
-          <div class="polaroid-img-wrapper">
-            <img src="photo3.jpg" alt="Yosha Elegant" loading="eager">
+        <!-- PHOTO 2: Childhood Photo -->
+        <div class="polaroid-card" onclick="openLightbox('photo2.jpeg')">
+          <div class="polaroid-frame">
+            <img src="photo2.jpeg" alt="Yosha Childhood" loading="eager">
           </div>
-          <div class="polaroid-caption">
-            <div class="polaroid-title">Graceful Beauty ❤️</div>
-            <div class="polaroid-date">Where words fall silent</div>
+          <div class="polaroid-meta">
+            <div class="polaroid-caption-title">Little Miracle 🌸</div>
+            <div class="polaroid-caption-sub">The sweetness of innocence</div>
+          </div>
+        </div>
+
+        <!-- PHOTO 3: Red Saree Portrait -->
+        <div class="polaroid-card tilt-right" onclick="openLightbox('photo3.jpeg')">
+          <div class="polaroid-frame">
+            <img src="photo3.jpeg" alt="Yosha Red Saree" loading="eager">
+          </div>
+          <div class="polaroid-meta">
+            <div class="polaroid-caption-title">Graceful Beauty ❤️</div>
+            <div class="polaroid-caption-sub">Where words fall silent</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- STAGE 3: THE PROPOSAL -->
+    <!-- STAGE 3: SECRET PROPOSAL -->
     <section class="proposal-card">
-      <div id="lockedView">
-        <button class="lock-btn" onclick="revealSecretProposal()">
+      <div id="proposalLockArea">
+        <button class="secret-btn" onclick="unlockProposal()">
           <span>🗝️</span>
           <span>Unlock Secret Message</span>
         </button>
       </div>
 
-      <div id="secretProposalContent">
-        <div class="proposal-text">
+      <div id="revealedProposal">
+        <div class="proposal-quote">
           "Thank you Yosha sab chizo ke liye and i really love you , meh aap jaisa bologe vaisa ban jaunga, or yosha meh apko yeh kehne ka mauka dunga ki saare ladke ek jaise nhi hote , kuch ladko ke liye unki wife hi sab kuch hotii hay , please yosha ek baar trust toh kro . Yosha will you marry me ?"
         </div>
 
-        <div class="proposal-buttons">
-          <button class="yes-btn" onclick="sayYes('Yes! 💍')">Yes! 💍</button>
-          <button class="yes-btn" onclick="sayYes('Yes, a thousand times! ❤️')">Yes, a thousand times! ❤️</button>
+        <div class="response-buttons">
+          <button class="proposal-yes-btn" onclick="acceptProposal('Yes! 💍')">Yes! 💍</button>
+          <button class="proposal-yes-btn" onclick="acceptProposal('Yes, a thousand times! ❤️')">Yes, a thousand times! ❤️</button>
         </div>
 
         <div id="celebrationBanner">
           <h3 style="font-family:'Alex Brush', cursive; font-size: 2.8rem; color: var(--burgundy); margin-bottom: 8px;">Forever Begins Now 💍✨</h3>
-          <p style="font-family:'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; color: #5c3b35;">
+          <p style="font-family:'Playfair Display', serif; font-size: 1.25rem; font-style: italic; color: #58332c;">
             Thank you for your trust, Yosha. I promise to cherish, respect, and stand by you in every step of this journey.
           </p>
         </div>
@@ -662,12 +685,12 @@
   <!-- LIGHTBOX MODAL -->
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
-    <img class="lightbox-content" id="lightboxImg" alt="Enlarged view">
+    <img class="lightbox-img" id="lightboxImg" alt="Enlarged preview">
   </div>
 
   <script>
-    /* 1. PETALS CANVAS ANIMATION */
-    const canvas = document.getElementById('canvas-petals');
+    /* 1. PETALS PARTICLES CANVAS */
+    const canvas = document.getElementById('petals-canvas');
     const ctx = canvas.getContext('2d');
     let petals = [];
 
@@ -679,18 +702,16 @@
     resizeCanvas();
 
     class Petal {
-      constructor() {
-        this.reset();
-      }
+      constructor() { this.reset(); }
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = -20;
-        this.size = Math.random() * 8 + 6;
-        this.speedX = Math.random() * 1.4 - 0.7;
-        this.speedY = Math.random() * 1.5 + 0.8;
+        this.size = Math.random() * 8 + 5;
+        this.speedX = Math.random() * 1.2 - 0.6;
+        this.speedY = Math.random() * 1.4 + 0.8;
         this.rotation = Math.random() * 360;
         this.rotationSpeed = Math.random() * 2 - 1;
-        this.opacity = Math.random() * 0.5 + 0.3;
+        this.opacity = Math.random() * 0.45 + 0.35;
       }
       update() {
         this.x += this.speedX;
@@ -703,7 +724,7 @@
         ctx.translate(this.x, this.y);
         ctx.rotate((this.rotation * Math.PI) / 180);
         ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = '#e8a598';
+        ctx.fillStyle = '#df9b8f';
         ctx.beginPath();
         ctx.ellipse(0, 0, this.size, this.size / 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
@@ -711,49 +732,47 @@
       }
     }
 
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 26; i++) {
       petals.push(new Petal());
     }
 
     function animatePetals() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      petals.forEach(p => {
-        p.update();
-        p.draw();
-      });
+      petals.forEach(p => { p.update(); p.draw(); });
       requestAnimationFrame(animatePetals);
     }
     animatePetals();
 
-    /* 2. AUDIO & ENVELOPE INTERACTION */
-    const bgMusic = document.getElementById('bgMusic');
-    const audioIcon = document.getElementById('audioIcon');
-    const audioLabel = document.getElementById('audioLabel');
+    /* 2. AUDIO TOGGLE */
+    const bgSong = document.getElementById('bgSong');
+    const soundIcon = document.getElementById('soundIcon');
+    const soundStatus = document.getElementById('soundStatus');
 
     function toggleAudio() {
-      if (bgMusic.paused) {
-        bgMusic.play();
-        audioIcon.textContent = '🎵';
-        audioLabel.textContent = 'Music: Playing';
+      if (bgSong.paused) {
+        bgSong.play();
+        soundIcon.textContent = '🎵';
+        soundStatus.textContent = 'Music: Playing';
       } else {
-        bgMusic.pause();
-        audioIcon.textContent = '🔇';
-        audioLabel.textContent = 'Music: Paused';
+        bgSong.pause();
+        soundIcon.textContent = '🔇';
+        soundStatus.textContent = 'Music: Paused';
       }
     }
 
+    /* 3. ENVELOPE OPENING HANDLER */
     function openEnvelope() {
-      const box = document.getElementById('envelopeBox');
+      const wrapper = document.getElementById('envelopeWrapper');
       const stage = document.getElementById('envelopeStage');
       const main = document.getElementById('mainWorld');
 
-      // Start music on user touch
-      bgMusic.play().then(() => {
-        audioIcon.textContent = '🎵';
-        audioLabel.textContent = 'Music: Playing';
+      // Play audio on user interaction
+      bgSong.play().then(() => {
+        soundIcon.textContent = '🎵';
+        soundStatus.textContent = 'Music: Playing';
       }).catch(() => {});
 
-      box.classList.add('is-opening');
+      wrapper.classList.add('is-opening');
 
       setTimeout(() => {
         stage.style.opacity = '0';
@@ -761,36 +780,34 @@
 
         setTimeout(() => {
           stage.style.display = 'none';
-          document.body.classList.add('envelope-opened');
+          document.body.classList.add('envelope-unlocked'); // Unlocks natural scrolling
           main.style.display = 'block';
 
-          // Force reflow for smooth transition
-          void main.offsetHeight;
+          void main.offsetHeight; // Reflow
           main.classList.add('visible');
 
           window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 800);
-      }, 900);
+        }, 750);
+      }, 850);
     }
 
-    /* 3. SECRET PROPOSAL & CELEBRATION */
-    function revealSecretProposal() {
-      document.getElementById('lockedView').style.display = 'none';
-      document.getElementById('secretProposalContent').style.display = 'block';
+    /* 4. PROPOSAL REVEAL & CELEBRATION */
+    function unlockProposal() {
+      document.getElementById('proposalLockArea').style.display = 'none';
+      document.getElementById('revealedProposal').style.display = 'block';
 
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: 70,
+        spread: 60,
         origin: { y: 0.65 }
       });
     }
 
-    function sayYes(text) {
+    function acceptProposal(answer) {
       document.getElementById('celebrationBanner').style.display = 'block';
 
-      // Confetti burst
       const end = Date.now() + 3.5 * 1000;
-      const colors = ['#c59b86', '#e27b88', '#ffd700', '#581825'];
+      const colors = ['#c59b86', '#e27b88', '#ffd700', '#56101f'];
 
       (function frame() {
         confetti({
@@ -813,12 +830,11 @@
       })();
     }
 
-    /* 4. LIGHTBOX */
-    function openLightbox(src, alt) {
+    /* 5. LIGHTBOX MODAL */
+    function openLightbox(src) {
       const modal = document.getElementById('lightboxModal');
       const img = document.getElementById('lightboxImg');
       img.src = src;
-      img.alt = alt;
       modal.style.display = 'flex';
     }
 
